@@ -4,3 +4,5 @@ __pycache__/
 .env
 node_modules/
 backend/models/
+backend/models/*.onnx
+backend/models/*.pt
