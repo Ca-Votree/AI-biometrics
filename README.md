@@ -86,7 +86,23 @@ python -m http.server 5500
 │   └── attendance.html# Quản lý Điểm danh
 └── README.md
 ```
+## 👨‍💻 Tác giả
 
+**Nguyễn Tuấn Vũ**
+
+**Vai trò:**
+- Trưởng nhóm phát triển
+- Thiết kế kiến trúc hệ thống
+- Phát triển Backend & Frontend
+- Tích hợp AI
+- Thiết kế cơ sở dữ liệu
+- Triển khai hệ thống
+
+---
+
+## 🎓 Thông tin đề tài
+
+Dự án được thực hiện trong khuôn khổ **đề tài nghiên cứu khoa học (NCKH)**, nghiên cứu và phát triển hệ thống điểm danh tự động sử dụng công nghệ nhận diện khuôn mặt dựa trên trí tuệ nhân tạo (AI).
 ## License
 
 Dành cho nghiên cứu khoa học - Đề tài NCKH.
