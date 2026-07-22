@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quản lý sinh viên và đăng ký khuôn mặt">
+    <title>AI Biometrics - Quản lý Sinh viên</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">🧬</div>
+                <div>
+                    <h1>AI Biometrics</h1>
+                    <span class="brand-sub">Attendance System</span>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link"><span class="nav-icon">📊</span><span>Dashboard</span></a></li>
+                <li class="nav-item"><a href="monitor.html" class="nav-link"><span class="nav-icon">📹</span><span>Giám sát Live</span></a></li>
+                <li class="nav-item"><a href="students.html" class="nav-link active"><span class="nav-icon">👥</span><span>Sinh viên</span></a></li>
+                <li class="nav-item"><a href="attendance.html" class="nav-link"><span class="nav-icon">📋</span><span>Điểm danh</span></a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="system-status"><span class="status-dot"></span><span>Hệ thống hoạt động</span></div>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <button class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+            
+            <div class="page-header">
+                <div>
+                    <h2 class="page-title"><span class="title-icon">👥</span>Quản lý Sinh viên</h2>
+                    <p class="page-subtitle">Thêm, xóa sinh viên và đăng ký khuôn mặt</p>
+                </div>
+                <div class="flex gap-sm">
+                    <button class="btn btn-primary" onclick="showAddModal()">➕ Thêm Sinh viên</button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon purple">👥</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalCount">--</div>
+                        <div class="stat-label">Tổng sinh viên</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">✅</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="registeredCount">--</div>
+                        <div class="stat-label">Đã đăng ký Face</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon amber">⏳</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="pendingCount">--</div>
+                        <div class="stat-label">Chưa đăng ký Face</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">📋 Danh sách Sinh viên</h3>
+                    <div class="flex gap-sm">
+                        <select class="form-select" id="filterFace" onchange="loadStudents()" style="width:auto; padding:0.4rem 0.8rem; font-size:0.85rem;">
+                            <option value="">Tất cả</option>
+                            <option value="true">Đã đăng ký Face</option>
+                            <option value="false">Chưa đăng ký</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Mã SV</th>
+                                <th>Họ tên</th>
+                                <th>Lớp</th>
+                                <th>Khoa</th>
+                                <th>Face</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted" style="padding:2rem;">Đang tải...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div class="modal-backdrop" id="addModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">➕ Thêm Sinh viên</h3>
+                <button class="modal-close" onclick="hideAddModal()">✕</button>
+            </div>
+            <form id="addStudentForm" onsubmit="addStudent(event)">
+                <div class="form-group">
+                    <label class="form-label">Mã sinh viên *</label>
+                    <input type="text" class="form-input" name="student_id" required placeholder="VD: SV001">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Họ và tên *</label>
+                    <input type="text" class="form-input" name="full_name" required placeholder="Nguyen Van A">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Lớp</label>
+                    <input type="text" class="form-input" name="class_name" placeholder="CNTT-K45">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Khoa</label>
+                    <input type="text" class="form-input" name="department" placeholder="Công nghệ thông tin">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" name="email" placeholder="email@example.com">
+                </div>
+                <div class="flex gap-sm" style="justify-content:flex-end;">
+                    <button type="button" class="btn btn-outline" onclick="hideAddModal()">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Thêm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Face Modal -->
+    <div class="modal-backdrop" id="faceModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">🧬 Đăng ký khuôn mặt</h3>
+                <button class="modal-close" onclick="hideFaceModal()">✕</button>
+            </div>
+            <p class="text-muted mb-md" id="faceModalInfo">Sinh viên: --</p>
+            <form id="registerFaceForm" onsubmit="registerFace(event)" enctype="multipart/form-data">
+                <input type="hidden" name="student_id" id="faceStudentId">
+                <div class="form-group">
+                    <label class="form-label">Upload ảnh khuôn mặt (1-5 ảnh)</label>
+                    <input type="file" class="form-input" name="files" multiple accept="image/*" required
+                        style="padding:0.8rem;"
+                        onchange="previewImages(this)">
+                    <p class="text-muted mt-sm" style="font-size:0.8rem;">
+                        💡 Nên upload 3-5 ảnh với các góc khác nhau để tăng độ chính xác
+                    </p>
+                </div>
+                <div id="imagePreview" class="flex gap-sm mb-md" style="flex-wrap:wrap;"></div>
+                <div class="flex gap-sm" style="justify-content:flex-end;">
+                    <button type="button" class="btn btn-outline" onclick="hideFaceModal()">Hủy</button>
+                    <button type="submit" class="btn btn-success" id="btnRegFace">🧬 Đăng ký</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        async function loadStudents() {
+            try {
+                const filter = document.getElementById('filterFace').value;
+                let url = 'http://localhost:8000/api/students/?limit=200';
+                if (filter) url += `&face_registered=${filter}`;
+
+                const res = await fetch(url);
+                const data = await res.json();
+
+                const tbody = document.getElementById('studentTableBody');
+                
+                if (!data.students || data.students.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted" style="padding:2rem;">Chưa có sinh viên nào</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = data.students.map(s => `
+                    <tr>
+                        <td><strong>${s.student_id}</strong></td>
+                        <td>${s.full_name}</td>
+                        <td>${s.class_name || '--'}</td>
+                        <td>${s.department || '--'}</td>
+                        <td>
+                            ${s.face_registered 
+                                ? `<span class="badge badge-success">✅ Đã đăng ký (${s.num_face_images})</span>`
+                                : '<span class="badge badge-warning">⏳ Chưa</span>'
+                            }
+                        </td>
+                        <td>
+                            <button class="btn btn-outline" style="font-size:0.8rem;padding:0.3rem 0.6rem;" 
+                                onclick="showFaceModal('${s.student_id}', '${s.full_name}')">
+                                🧬 Đăng ký Face
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Update stats
+                const total = data.students.length;
+                const registered = data.students.filter(s => s.face_registered).length;
+                document.getElementById('totalCount').textContent = total;
+                document.getElementById('registeredCount').textContent = registered;
+                document.getElementById('pendingCount').textContent = total - registered;
+
+            } catch (err) {
+                console.error('Load students error:', err);
+                showToast('Lỗi tải danh sách sinh viên', 'error');
+            }
+        }
+
+        async function addStudent(event) {
+            event.preventDefault();
+            const form = new FormData(event.target);
+            try {
+                const res = await fetch('http://localhost:8000/api/students/', { method: 'POST', body: form });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast(`Đã thêm sinh viên ${form.get('student_id')}`, 'success');
+                    hideAddModal();
+                    event.target.reset();
+                    loadStudents();
+                } else {
+                    showToast(data.detail || 'Lỗi', 'error');
+                }
+            } catch (err) {
+                showToast('Lỗi kết nối', 'error');
+            }
+        }
+
+        async function registerFace(event) {
+            event.preventDefault();
+            const form = new FormData(event.target);
+            const studentId = form.get('student_id');
+            
+            document.getElementById('btnRegFace').textContent = '⏳ Đang xử lý...';
+            document.getElementById('btnRegFace').disabled = true;
+            
+            try {
+                const res = await fetch(`http://localhost:8000/api/students/${studentId}/register-face`, {
+                    method: 'POST',
+                    body: form,
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast(data.message, 'success');
+                    hideFaceModal();
+                    loadStudents();
+                } else {
+                    showToast(data.detail || 'Lỗi đăng ký', 'error');
+                }
+            } catch (err) {
+                showToast('Lỗi kết nối', 'error');
+            } finally {
+                document.getElementById('btnRegFace').textContent = '🧬 Đăng ký';
+                document.getElementById('btnRegFace').disabled = false;
+            }
+        }
+
+        function previewImages(input) {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            [...input.files].forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.cssText = 'width:80px;height:80px;object-fit:cover;border-radius:var(--radius-md);border:2px solid var(--border);';
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function showAddModal() { document.getElementById('addModal').classList.add('active'); }
+        function hideAddModal() { document.getElementById('addModal').classList.remove('active'); }
+        function showFaceModal(id, name) {
+            document.getElementById('faceStudentId').value = id;
+            document.getElementById('faceModalInfo').textContent = `Sinh viên: ${id} - ${name}`;
+            document.getElementById('imagePreview').innerHTML = '';
+            document.getElementById('registerFaceForm').reset();
+            document.getElementById('faceStudentId').value = id;
+            document.getElementById('faceModal').classList.add('active');
+        }
+        function hideFaceModal() { document.getElementById('faceModal').classList.remove('active'); }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // Load on page ready
+        loadStudents();
+    </script>
+</body>
+</html>

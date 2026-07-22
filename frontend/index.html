@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hệ thống điểm danh tự động bằng nhận diện khuôn mặt AI">
+    <title>AI Biometrics - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">🧬</div>
+                <div>
+                    <h1>AI Biometrics</h1>
+                    <span class="brand-sub">Attendance System</span>
+                </div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link active">
+                        <span class="nav-icon">📊</span>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="monitor.html" class="nav-link">
+                        <span class="nav-icon">📹</span>
+                        <span>Giám sát Live</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="students.html" class="nav-link">
+                        <span class="nav-icon">👥</span>
+                        <span>Sinh viên</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="attendance.html" class="nav-link">
+                        <span class="nav-icon">📋</span>
+                        <span>Điểm danh</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <div class="system-status" id="systemStatus">
+                    <span class="status-dot"></span>
+                    <span>Hệ thống hoạt động</span>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+            
+            <div class="page-header">
+                <div>
+                    <h2 class="page-title">
+                        <span class="title-icon">📊</span>
+                        Dashboard
+                    </h2>
+                    <p class="page-subtitle">Tổng quan hệ thống điểm danh AI</p>
+                </div>
+                <div class="flex gap-sm">
+                    <button class="btn btn-outline" onclick="refreshDashboard()">🔄 Làm mới</button>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-icon purple">👥</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalStudents">--</div>
+                        <div class="stat-label">Tổng sinh viên</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon cyan">🧬</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="registeredFaces">--</div>
+                        <div class="stat-label">Đã đăng ký Face</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">✅</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="todayAttendance">--</div>
+                        <div class="stat-label">Đã điểm danh hôm nay</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon amber">📸</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="cameraStatus">--</div>
+                        <div class="stat-label">Trạng thái Camera</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="grid-2">
+                <!-- Active Session -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📋 Phiên điểm danh hiện tại</h3>
+                        <span class="badge badge-success" id="sessionBadge" style="display:none;">Đang hoạt động</span>
+                    </div>
+                    <div id="activeSession">
+                        <div class="empty-state">
+                            <div class="empty-icon">📋</div>
+                            <p>Chưa có phiên điểm danh nào đang hoạt động</p>
+                            <a href="attendance.html" class="btn btn-primary mt-md">Tạo phiên mới</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🕐 Lịch sử phiên gần đây</h3>
+                    </div>
+                    <div id="recentSessions">
+                        <div class="empty-state">
+                            <div class="empty-icon">📅</div>
+                            <p>Chưa có phiên điểm danh nào</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System Info -->
+            <div class="card mt-lg">
+                <div class="card-header">
+                    <h3 class="card-title">⚙️ Thông tin hệ thống</h3>
+                </div>
+                <div class="grid-3" id="systemInfo">
+                    <div>
+                        <p class="text-muted" style="font-size:0.8rem;">AI Model</p>
+                        <p style="font-weight:600;">InsightFace (SCRFD + ArcFace)</p>
+                    </div>
+                    <div>
+                        <p class="text-muted" style="font-size:0.8rem;">Vector Database</p>
+                        <p style="font-weight:600;">FAISS (IndexFlatIP)</p>
+                    </div>
+                    <div>
+                        <p class="text-muted" style="font-size:0.8rem;">Embedding Dimension</p>
+                        <p style="font-weight:600;">512-d (L2 Normalized)</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // === Dashboard Logic ===
+        async function refreshDashboard() {
+            try {
+                const res = await fetch('http://localhost:8000/api/attendance/dashboard');
+                const data = await res.json();
+
+                document.getElementById('totalStudents').textContent = data.total_students || 0;
+                document.getElementById('registeredFaces').textContent = data.registered_faces || 0;
+
+                // Active session
+                if (data.active_session) {
+                    document.getElementById('todayAttendance').textContent = data.active_session.attendance_count || 0;
+                    document.getElementById('sessionBadge').style.display = 'inline-flex';
+                    document.getElementById('activeSession').innerHTML = `
+                        <div style="padding: 0.5rem 0;">
+                            <p style="font-weight:600; font-size:1.1rem; color:var(--text-bright);">
+                                ${data.active_session.name}
+                            </p>
+                            <p class="text-muted mt-sm">
+                                Đã điểm danh: <strong class="text-success">${data.active_session.attendance_count}</strong> sinh viên
+                            </p>
+                            <div class="mt-md flex gap-sm">
+                                <a href="monitor.html" class="btn btn-primary">📹 Giám sát</a>
+                                <a href="attendance.html" class="btn btn-outline">Chi tiết</a>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('todayAttendance').textContent = '0';
+                }
+
+                // Recent sessions
+                if (data.recent_sessions && data.recent_sessions.length > 0) {
+                    document.getElementById('recentSessions').innerHTML = data.recent_sessions.map(s => `
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0; border-bottom:1px solid var(--border);">
+                            <div>
+                                <p style="font-weight:500; font-size:0.9rem;">${s.name}</p>
+                                <p class="text-muted" style="font-size:0.8rem;">${s.date ? new Date(s.date).toLocaleString('vi-VN') : 'N/A'}</p>
+                            </div>
+                            <span class="badge badge-info">${s.total} SV</span>
+                        </div>
+                    `).join('');
+                }
+
+                // Camera status
+                const camRes = await fetch('http://localhost:8000/api/camera/status');
+                const camData = await camRes.json();
+                document.getElementById('cameraStatus').textContent = camData.running ? 'Đang chạy' : 'Tắt';
+
+            } catch (err) {
+                console.error('Dashboard error:', err);
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // Load dashboard on page load
+        refreshDashboard();
+        // Auto-refresh every 10s
+        setInterval(refreshDashboard, 10000);
+    </script>
+</body>
+</html>
