@@ -68,7 +68,7 @@ python -m http.server 5500
 4. **Bật camera**: Vào trang Giám sát Live → Bật Camera → Kết nối Stream
 5. **Xem kết quả**: Theo dõi trực tiếp trên Dashboard hoặc chi tiết trong từng Phiên điểm danh.
 
-## 📁 Cấu trúc dự án mới
+## 📁 Cấu trúc dự án
 
 ```
 ├── backend/           # Thư mục xử lý logic & AI Model (FastAPI)
